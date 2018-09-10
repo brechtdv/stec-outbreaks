@@ -1,7 +1,7 @@
 STEC outbreak model
 ================
 Bdevleesschauwer
-Sun Sep 09 19:20:17 2018
+Mon Sep 10 17:05:36 2018
 
 # Settings
 
@@ -263,7 +263,7 @@ ggplot(PriorS_df, aes(x = Food, y = mean)) +
   geom_pointrange(aes(ymin = lwr, ymax = upr), size = 0.1) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_y_continuous("Attributable proportion") +
+  scale_y_continuous(expression(P[j])) +
   scale_x_discrete(NULL)
 ```
 
@@ -617,7 +617,88 @@ kable(AttribWPRO_unk_out[rev(order(AttribWPRO_unk_out[, 1])), ], digits = 1)
 | Eggs                 |  0.0 |  0.0 |   0.0 |
 
 ``` r
-## plot all results
+## normalized
+AttribAMRO_norm <- 100 * apply(AttribAMRO/100, 2, prop.table)
+AttribEURO_norm <- 100 * apply(AttribEURO/100, 2, prop.table)
+AttribWPRO_norm <- 100 * apply(AttribWPRO/100, 2, prop.table)
+
+AttribAMRO_norm_out <- t(apply(AttribAMRO_norm, 1, mean_ci))
+AttribEURO_norm_out <- t(apply(AttribEURO_norm, 1, mean_ci))
+AttribWPRO_norm_out <- t(apply(AttribWPRO_norm, 1, mean_ci))
+
+kable(AttribAMRO_norm_out[rev(order(AttribAMRO_norm_out[, 1])), ], digits = 1)
+```
+
+|                      | mean | 2.5% | 97.5% |
+| -------------------- | ---: | ---: | ----: |
+| Beef                 | 40.0 | 39.2 |  40.7 |
+| Vegetables and fruit | 35.2 | 34.2 |  36.3 |
+| Dairy                | 12.0 | 11.2 |  12.7 |
+| Grains and beans     |  3.0 |  2.4 |   3.8 |
+| Pork                 |  2.7 |  2.4 |   3.2 |
+| Meat                 |  2.5 |  2.4 |   2.9 |
+| Game                 |  1.2 |  1.2 |   1.5 |
+| Lamb                 |  1.0 |  0.9 |   1.2 |
+| nuts                 |  0.9 |  0.9 |   0.9 |
+| Seafood              |  0.9 |  0.9 |   0.9 |
+| Chicken              |  0.6 |  0.6 |   0.9 |
+| Eggs                 |  0.1 |  0.0 |   0.3 |
+| Oils and sugar       |  0.0 |  0.0 |   0.3 |
+| Turkey               |  0.0 |  0.0 |   0.0 |
+| Mutton               |  0.0 |  0.0 |   0.0 |
+| Ducks                |  0.0 |  0.0 |   0.0 |
+| Poultry              |  0.0 |  0.0 |   0.0 |
+
+``` r
+kable(AttribEURO_norm_out[rev(order(AttribEURO_norm_out[, 1])), ], digits = 1)
+```
+
+|                      | mean | 2.5% | 97.5% |
+| -------------------- | ---: | ---: | ----: |
+| Beef                 | 30.6 | 27.9 |  33.8 |
+| Vegetables and fruit | 27.9 | 25.0 |  30.9 |
+| Dairy                | 16.2 | 16.2 |  16.2 |
+| Meat                 |  7.5 |  7.4 |   8.8 |
+| Seafood              |  4.4 |  4.4 |   4.4 |
+| Pork                 |  4.4 |  4.4 |   4.4 |
+| Grains and beans     |  3.0 |  2.9 |   4.4 |
+| Lamb                 |  1.5 |  1.5 |   2.9 |
+| Chicken              |  1.5 |  1.5 |   1.5 |
+| Game                 |  1.5 |  1.5 |   1.5 |
+| Eggs                 |  1.5 |  1.5 |   1.5 |
+| Oils and sugar       |  0.0 |  0.0 |   0.0 |
+| nuts                 |  0.0 |  0.0 |   0.0 |
+| Mutton               |  0.0 |  0.0 |   0.0 |
+| Turkey               |  0.0 |  0.0 |   0.0 |
+| Ducks                |  0.0 |  0.0 |   0.0 |
+| Poultry              |  0.0 |  0.0 |   0.0 |
+
+``` r
+kable(AttribWPRO_norm_out[rev(order(AttribWPRO_norm_out[, 1])), ], digits = 1)
+```
+
+|                      | mean | 2.5% | 97.5% |
+| -------------------- | ---: | ---: | ----: |
+| Vegetables and fruit | 43.0 | 36.4 |  45.5 |
+| Dairy                | 27.3 | 27.3 |  27.3 |
+| Game                 |  9.1 |  9.1 |   9.1 |
+| Beef                 |  8.4 |  0.0 |   9.1 |
+| Meat                 |  5.9 |  0.0 |  18.2 |
+| Pork                 |  4.9 |  0.0 |  18.2 |
+| Grains and beans     |  1.5 |  0.0 |   9.1 |
+| Oils and sugar       |  0.0 |  0.0 |   0.0 |
+| nuts                 |  0.0 |  0.0 |   0.0 |
+| Seafood              |  0.0 |  0.0 |   0.0 |
+| Mutton               |  0.0 |  0.0 |   0.0 |
+| Lamb                 |  0.0 |  0.0 |   0.0 |
+| Turkey               |  0.0 |  0.0 |   0.0 |
+| Ducks                |  0.0 |  0.0 |   0.0 |
+| Chicken              |  0.0 |  0.0 |   0.0 |
+| Poultry              |  0.0 |  0.0 |   0.0 |
+| Eggs                 |  0.0 |  0.0 |   0.0 |
+
+``` r
+## plot all results / with unknown
 df <-
 rbind(
   data.frame(Region = "AMRO",
@@ -632,6 +713,7 @@ rbind(
 
 foods <- rev(rownames(AttribAMRO_out[order(AttribAMRO_out[, 1]), ]))
 df$Food <- factor(df$Food, levels = foods)
+df$Region <- gsub("O", "", df$Region)
 ```
 
 ``` r
@@ -648,6 +730,39 @@ ggplot(df, aes(x = Food, y = mean)) +
 ![](stec-outbreaks-multinom2_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
+## plot all results / normalized
+df2 <-
+rbind(
+  data.frame(Region = "AMRO",
+             Food = rownames(AttribAMRO_out),
+             AttribAMRO_norm_out),
+  data.frame(Region = "EURO",
+             Food = rownames(AttribEURO_out),
+             AttribEURO_norm_out),
+  data.frame(Region = "WPRO",
+             Food = rownames(AttribWPRO_out),
+             AttribWPRO_norm_out))
+
+foods <- rev(rownames(AttribAMRO_out[order(AttribAMRO_out[, 1]), ]))
+df2$Food <- factor(df2$Food, levels = foods)
+df2$Region <- gsub("O", "", df2$Region)
+```
+
+``` r
+ggplot(df2, aes(x = Food, y = mean)) +
+  geom_col(fill = "grey90") +
+  geom_pointrange(aes(ymin = X2.5., ymax = X97.5.), size = 0.1) +
+  facet_grid(~Region) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous("Attributable proportion") +
+  scale_x_discrete(NULL)
+```
+
+![](stec-outbreaks-multinom2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+## summary table
 kable(
   digits = 1,
   cbind(AttribAMRO_unk_out, AttribEURO_unk_out, AttribWPRO_unk_out))
@@ -698,8 +813,8 @@ sessionInfo()
     ## [1] knitr_1.20    ggplot2_3.0.0 bd_0.0.12    
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_0.12.18     highr_0.7        cellranger_1.1.0 compiler_3.5.1  
-    ##  [5] pillar_1.3.0     plyr_1.8.4       bindr_0.1.1      tools_3.5.1     
+    ##  [1] Rcpp_0.12.18     cellranger_1.1.0 compiler_3.5.1   pillar_1.3.0    
+    ##  [5] plyr_1.8.4       highr_0.7        bindr_0.1.1      tools_3.5.1     
     ##  [9] digest_0.6.15    evaluate_0.11    tibble_1.4.2     gtable_0.2.0    
     ## [13] pkgconfig_2.0.1  rlang_0.2.1      yaml_2.2.0       bindrcpp_0.2.2  
     ## [17] withr_2.1.2      stringr_1.3.1    dplyr_0.7.6      rprojroot_1.3-2 
