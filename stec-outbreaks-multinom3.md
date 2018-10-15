@@ -1,7 +1,7 @@
 STEC outbreak model
 ================
 Bdevleesschauwer
-Mon Sep 10 17:05:36 2018
+Mon Oct 15 10:31:20 2018
 
 # Settings
 
@@ -21,7 +21,8 @@ set.seed(264)
 
 ``` r
 ## import data
-dta <- readxl("All data FINAL_27March2018.xlsx", "FINAL data WITHOUT Water")
+dta <-
+  readxl("All data FINAL_oCTOBER 2018_2.xlsx", "FINAL data WITHOUT Water")
 str(dta)
 ```
 
@@ -86,6 +87,8 @@ names(dta)[names(dta) == "GrainsBeans"] <-
   "Grains and beans"
 names(dta)[names(dta) == "Oils_sugar"] <-
   "Oils and sugar"
+names(dta)[names(dta) == "nuts"] <-
+  "Nuts"
 
 ## add indicator combining region-type
 dta$Region_Type <- paste(dta$WHO_Region, dta$Complex_Simple)
@@ -104,7 +107,7 @@ table(dta$Complex_Simple)
 
     ## 
     ##   A   C   S 
-    ## 541  70 346
+    ## 539  57 361
 
 ``` r
 table(dta$WHO_Region, dta$Complex_Simple)
@@ -112,9 +115,34 @@ table(dta$WHO_Region, dta$Complex_Simple)
 
     ##       
     ##          A   C   S
-    ##   AMRO 407  55 284
-    ##   EURO 110  11  55
+    ##   AMRO 406  45 295
+    ##   EURO 109   8  59
     ##   WPRO  24   4   7
+
+``` r
+## number of implied foods per type
+table(rowSums(dta[dta$Complex_Simple == "S", 34:50]))  # all =1 ?
+```
+
+    ## 
+    ##   1 
+    ## 361
+
+``` r
+table(rowSums(dta[dta$Complex_Simple == "C", 34:50]))  # all >1 ?
+```
+
+    ## 
+    ##  2  3  4 
+    ## 43 12  2
+
+``` r
+table(rowSums(dta[dta$Complex_Simple == "A", 34:50]))  # all =0 ?
+```
+
+    ## 
+    ##   0 
+    ## 539
 
 ``` r
 ## extract ALL outbreak data
@@ -137,7 +165,7 @@ F <- dta[, 34:50]; str(F)
     ##  $ Vegetables and fruit: num  0 0 0 0 0 0 1 0 0 0 ...
     ##  $ Grains and beans    : num  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ Seafood             : num  0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ nuts                : num  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ Nuts                : num  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ Oils and sugar      : num  0 0 0 0 0 0 0 0 0 0 ...
 
 ``` r
@@ -145,12 +173,12 @@ sort(colSums(F), decreasing = TRUE)
 ```
 
     ##                 Beef Vegetables and fruit                Dairy 
-    ##                  164                  153                   59 
+    ##                  164                  154                   61 
     ##     Grains and beans                 Meat                 Pork 
-    ##                   25                   20                   17 
-    ##                 Eggs              Chicken                 Lamb 
-    ##                    9                    9                    7 
-    ##                 Game              Seafood                 nuts 
+    ##                   28                   19                   17 
+    ##              Chicken                 Eggs                 Lamb 
+    ##                   11                   10                    7 
+    ##                 Game              Seafood                 Nuts 
     ##                    7                    6                    3 
     ##               Turkey       Oils and sugar              Poultry 
     ##                    2                    2                    0 
@@ -163,14 +191,14 @@ table(rowSums(F))
 
     ## 
     ##   0   1   2   3   4 
-    ## 539 367  39  10   2
+    ## 539 361  43  12   2
 
 ``` r
 ## extract SIMPLE outbreak data
 S <- dta[dta$Complex_Simple == "S", 34:50]; str(S)
 ```
 
-    ## 'data.frame':    346 obs. of  17 variables:
+    ## 'data.frame':    361 obs. of  17 variables:
     ##  $ Eggs                : num  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ Dairy               : num  0 0 0 0 1 0 0 1 0 1 ...
     ##  $ Meat                : num  0 0 0 0 0 0 0 0 0 0 ...
@@ -186,7 +214,7 @@ S <- dta[dta$Complex_Simple == "S", 34:50]; str(S)
     ##  $ Vegetables and fruit: num  0 0 0 0 0 0 1 0 0 0 ...
     ##  $ Grains and beans    : num  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ Seafood             : num  0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ nuts                : num  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ Nuts                : num  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ Oils and sugar      : num  0 0 0 0 0 0 0 0 0 0 ...
 
 ``` r
@@ -194,35 +222,34 @@ sort(colSums(S), decreasing = TRUE)
 ```
 
     ##                 Beef Vegetables and fruit                Dairy 
-    ##                  139                  105                   49 
+    ##                  143                  116                   49 
     ##                 Meat                 Pork     Grains and beans 
-    ##                   13                   11                    9 
+    ##                   11                   11                   10 
     ##                 Game              Seafood                 Lamb 
     ##                    6                    6                    4 
-    ##                 nuts              Chicken                 Eggs 
-    ##                    3                    2                    1 
+    ##                 Nuts                 Eggs              Chicken 
+    ##                    3                    1                    1 
     ##              Poultry                Ducks               Turkey 
     ##                    0                    0                    0 
     ##               Mutton       Oils and sugar 
     ##                    0                    0
 
 ``` r
-table(rowSums(S))
+table(rowSums(S))  # all == 1 ?
 ```
 
     ## 
-    ##   1   2 
-    ## 344   2
+    ##   1 
+    ## 361
 
 # Model
 
 ``` r
-## prior distribution
+## prior distribution / Dirichlet
 
 sourceS <- colSums(S)
-totalS <- nrow(S)
-
-PriorS <- sapply(sourceS, function(x) rbeta(n, x + 1, totalS - x + 1))
+PriorS <- mc2d::rdirichlet(n, sourceS)
+colnames(PriorS) <- names(sourceS)
 
 PriorS_out <- t(apply(PriorS, 2, mean_ci))[rev(order(colMeans(PriorS))), ]
 kable(
@@ -232,23 +259,23 @@ kable(
 
 |                      |  mean |  2.5% | 97.5% |
 | -------------------- | ----: | ----: | ----: |
-| Beef                 | 0.402 | 0.353 | 0.453 |
-| Vegetables and fruit | 0.304 | 0.257 | 0.353 |
-| Dairy                | 0.144 | 0.110 | 0.183 |
-| Meat                 | 0.040 | 0.022 | 0.063 |
-| Pork                 | 0.035 | 0.018 | 0.056 |
-| Grains and beans     | 0.029 | 0.014 | 0.049 |
-| Seafood              | 0.020 | 0.008 | 0.038 |
-| Game                 | 0.020 | 0.008 | 0.037 |
-| Lamb                 | 0.014 | 0.005 | 0.029 |
-| nuts                 | 0.011 | 0.003 | 0.025 |
-| Chicken              | 0.009 | 0.002 | 0.021 |
-| Eggs                 | 0.006 | 0.001 | 0.016 |
-| Ducks                | 0.003 | 0.000 | 0.011 |
-| Mutton               | 0.003 | 0.000 | 0.011 |
-| Oils and sugar       | 0.003 | 0.000 | 0.011 |
-| Turkey               | 0.003 | 0.000 | 0.011 |
-| Poultry              | 0.003 | 0.000 | 0.011 |
+| Beef                 | 0.396 | 0.346 | 0.447 |
+| Vegetables and fruit | 0.321 | 0.274 | 0.369 |
+| Dairy                | 0.136 | 0.103 | 0.173 |
+| Pork                 | 0.031 | 0.015 | 0.051 |
+| Meat                 | 0.030 | 0.015 | 0.050 |
+| Grains and beans     | 0.028 | 0.013 | 0.047 |
+| Seafood              | 0.017 | 0.006 | 0.032 |
+| Game                 | 0.017 | 0.006 | 0.032 |
+| Lamb                 | 0.011 | 0.003 | 0.024 |
+| Nuts                 | 0.008 | 0.002 | 0.020 |
+| Eggs                 | 0.003 | 0.000 | 0.010 |
+| Chicken              | 0.003 | 0.000 | 0.010 |
+| Oils and sugar       | 0.000 | 0.000 | 0.000 |
+| Mutton               | 0.000 | 0.000 | 0.000 |
+| Turkey               | 0.000 | 0.000 | 0.000 |
+| Ducks                | 0.000 | 0.000 | 0.000 |
+| Poultry              | 0.000 | 0.000 | 0.000 |
 
 ``` r
 PriorS_df <- as.data.frame(PriorS_out)
@@ -267,7 +294,7 @@ ggplot(PriorS_df, aes(x = Food, y = mean)) +
   scale_x_discrete(NULL)
 ```
 
-![](stec-outbreaks-multinom2_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](stec-outbreaks-multinom3_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 ## simple foods
@@ -280,17 +307,17 @@ kable(cbind(sourceSAMRO, sourceSEURO, sourceSWPRO)[rev(order(sourceSAMRO)), ])
 
 |                      | sourceSAMRO | sourceSEURO | sourceSWPRO |
 | -------------------- | ----------: | ----------: | ----------: |
-| Beef                 |         124 |          15 |           0 |
-| Vegetables and fruit |          87 |          15 |           3 |
+| Beef                 |         125 |          18 |           0 |
+| Vegetables and fruit |          97 |          16 |           3 |
 | Dairy                |          35 |          11 |           3 |
-| Grains and beans     |           8 |           1 |           0 |
+| Grains and beans     |           8 |           2 |           0 |
 | Pork                 |           8 |           3 |           0 |
-| Meat                 |           8 |           5 |           0 |
+| Meat                 |           8 |           3 |           0 |
 | Game                 |           4 |           1 |           1 |
-| nuts                 |           3 |           0 |           0 |
+| Nuts                 |           3 |           0 |           0 |
 | Seafood              |           3 |           3 |           0 |
 | Lamb                 |           3 |           1 |           0 |
-| Chicken              |           1 |           1 |           0 |
+| Chicken              |           1 |           0 |           0 |
 | Oils and sugar       |           0 |           0 |           0 |
 | Mutton               |           0 |           0 |           0 |
 | Turkey               |           0 |           0 |           0 |
@@ -323,13 +350,13 @@ nm <- 20  # number of multinomial samples
 cAMRO <- replicate(nm, simulate(aAMRO)); str(cAMRO)
 ```
 
-    ##  int [1:17, 1:55, 1:10000, 1:20] 0 0 0 0 0 0 0 1 0 0 ...
+    ##  int [1:17, 1:45, 1:10000, 1:20] 0 0 0 0 0 0 0 1 0 0 ...
 
 ``` r
 cEURO <- replicate(nm, simulate(aEURO)); str(cEURO)
 ```
 
-    ##  int [1:17, 1:11, 1:10000, 1:20] 0 0 0 0 0 0 0 1 0 0 ...
+    ##  int [1:17, 1:8, 1:10000, 1:20] 0 0 1 0 0 0 0 0 0 0 ...
 
 ``` r
 cWPRO <- replicate(nm, simulate(aWPRO)); str(cWPRO)
@@ -347,19 +374,19 @@ cWPRO <- array(cWPRO, dim = dim(aWPRO) * c(1, 1, nm))
 sourceCAMRO <- apply(cAMRO, c(1,3), sum); str(sourceCAMRO)
 ```
 
-    ##  int [1:17, 1:200000] 0 5 0 0 1 0 0 12 2 1 ...
+    ##  int [1:17, 1:200000] 0 7 0 0 0 0 0 14 2 1 ...
 
 ``` r
 sourceCEURO <- apply(cEURO, c(1,3), sum); str(sourceCEURO)
 ```
 
-    ##  int [1:17, 1:200000] 0 0 0 0 0 0 0 7 0 0 ...
+    ##  int [1:17, 1:200000] 0 0 1 0 0 0 0 3 0 0 ...
 
 ``` r
 sourceCWPRO <- apply(cWPRO, c(1,3), sum); str(sourceCWPRO)
 ```
 
-    ##  int [1:17, 1:200000] 0 0 1 0 0 0 0 1 0 0 ...
+    ##  int [1:17, 1:200000] 0 0 0 0 0 0 0 1 1 0 ...
 
 ``` r
 rownames(sourceCAMRO) <-
@@ -376,21 +403,21 @@ kable(sourceCAMRO_out[rev(order(sourceCAMRO_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Vegetables and fruit | 32.2 |   29 |    36 |
-| Beef                 | 11.5 |    9 |    14 |
-| Dairy                |  5.5 |    3 |     8 |
-| Grains and beans     |  2.3 |    0 |     5 |
+| Vegetables and fruit | 22.9 |   19 |    26 |
+| Beef                 | 11.4 |    8 |    14 |
+| Dairy                |  6.1 |    4 |     9 |
+| Grains and beans     |  2.6 |    0 |     5 |
 | Pork                 |  1.2 |    0 |     3 |
-| Chicken              |  1.1 |    1 |     2 |
-| Meat                 |  0.4 |    0 |     2 |
-| Lamb                 |  0.4 |    0 |     1 |
-| Eggs                 |  0.2 |    0 |     1 |
+| Lamb                 |  0.3 |    0 |     1 |
+| Meat                 |  0.3 |    0 |     2 |
+| Eggs                 |  0.1 |    0 |     1 |
+| Chicken              |  0.1 |    0 |     1 |
 | Game                 |  0.0 |    0 |     1 |
-| Oils and sugar       |  0.0 |    0 |     1 |
-| Turkey               |  0.0 |    0 |     0 |
-| nuts                 |  0.0 |    0 |     0 |
+| Oils and sugar       |  0.0 |    0 |     0 |
+| Nuts                 |  0.0 |    0 |     0 |
 | Seafood              |  0.0 |    0 |     0 |
 | Mutton               |  0.0 |    0 |     0 |
+| Turkey               |  0.0 |    0 |     0 |
 | Ducks                |  0.0 |    0 |     0 |
 | Poultry              |  0.0 |    0 |     0 |
 
@@ -400,14 +427,14 @@ kable(sourceCEURO_out[rev(order(sourceCEURO_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Beef                 |  5.8 |    4 |     8 |
-| Vegetables and fruit |  4.0 |    2 |     6 |
-| Grains and beans     |  1.0 |    1 |     2 |
-| Meat                 |  0.1 |    0 |     1 |
+| Vegetables and fruit |  4.1 |    2 |     6 |
+| Beef                 |  2.7 |    1 |     5 |
+| Meat                 |  1.0 |    0 |     2 |
+| Chicken              |  0.1 |    0 |     1 |
+| Grains and beans     |  0.0 |    0 |     1 |
 | Lamb                 |  0.0 |    0 |     1 |
-| Chicken              |  0.0 |    0 |     0 |
 | Oils and sugar       |  0.0 |    0 |     0 |
-| nuts                 |  0.0 |    0 |     0 |
+| Nuts                 |  0.0 |    0 |     0 |
 | Seafood              |  0.0 |    0 |     0 |
 | Game                 |  0.0 |    0 |     0 |
 | Mutton               |  0.0 |    0 |     0 |
@@ -424,13 +451,13 @@ kable(sourceCWPRO_out[rev(order(sourceCWPRO_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Vegetables and fruit |  1.7 |    1 |     2 |
+| Vegetables and fruit |  1.8 |    1 |     2 |
 | Beef                 |  0.9 |    0 |     1 |
 | Meat                 |  0.6 |    0 |     2 |
-| Pork                 |  0.5 |    0 |     2 |
+| Pork                 |  0.6 |    0 |     2 |
 | Grains and beans     |  0.2 |    0 |     1 |
 | Oils and sugar       |  0.0 |    0 |     0 |
-| nuts                 |  0.0 |    0 |     0 |
+| Nuts                 |  0.0 |    0 |     0 |
 | Seafood              |  0.0 |    0 |     0 |
 | Game                 |  0.0 |    0 |     0 |
 | Mutton               |  0.0 |    0 |     0 |
@@ -457,21 +484,21 @@ kable(TotalAMRO_out[rev(order(TotalAMRO_out[, 1])), ], digits = 1)
 
 |                      |  mean | 2.5% | 97.5% |
 | -------------------- | ----: | ---: | ----: |
-| Beef                 | 135.5 |  133 |   138 |
-| Vegetables and fruit | 119.2 |  116 |   123 |
-| Dairy                |  40.5 |   38 |    43 |
-| Grains and beans     |  10.3 |    8 |    13 |
+| Beef                 | 136.4 |  133 |   139 |
+| Vegetables and fruit | 119.9 |  116 |   123 |
+| Dairy                |  41.1 |   39 |    44 |
+| Grains and beans     |  10.6 |    8 |    13 |
 | Pork                 |   9.2 |    8 |    11 |
-| Meat                 |   8.4 |    8 |    10 |
+| Meat                 |   8.3 |    8 |    10 |
 | Game                 |   4.0 |    4 |     5 |
-| Lamb                 |   3.4 |    3 |     4 |
-| nuts                 |   3.0 |    3 |     3 |
+| Lamb                 |   3.3 |    3 |     4 |
+| Nuts                 |   3.0 |    3 |     3 |
 | Seafood              |   3.0 |    3 |     3 |
-| Chicken              |   2.1 |    2 |     3 |
-| Eggs                 |   0.2 |    0 |     1 |
-| Oils and sugar       |   0.0 |    0 |     1 |
-| Turkey               |   0.0 |    0 |     0 |
+| Chicken              |   1.1 |    1 |     2 |
+| Eggs                 |   0.1 |    0 |     1 |
+| Oils and sugar       |   0.0 |    0 |     0 |
 | Mutton               |   0.0 |    0 |     0 |
+| Turkey               |   0.0 |    0 |     0 |
 | Ducks                |   0.0 |    0 |     0 |
 | Poultry              |   0.0 |    0 |     0 |
 
@@ -481,19 +508,19 @@ kable(TotalEURO_out[rev(order(TotalEURO_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Beef                 | 20.8 |   19 |    23 |
-| Vegetables and fruit | 19.0 |   17 |    21 |
+| Beef                 | 20.7 |   19 |    23 |
+| Vegetables and fruit | 20.1 |   18 |    22 |
 | Dairy                | 11.0 |   11 |    11 |
-| Meat                 |  5.1 |    5 |     6 |
+| Meat                 |  4.0 |    3 |     5 |
 | Seafood              |  3.0 |    3 |     3 |
 | Pork                 |  3.0 |    3 |     3 |
 | Grains and beans     |  2.0 |    2 |     3 |
 | Lamb                 |  1.0 |    1 |     2 |
-| Chicken              |  1.0 |    1 |     1 |
 | Game                 |  1.0 |    1 |     1 |
 | Eggs                 |  1.0 |    1 |     1 |
+| Chicken              |  0.1 |    0 |     1 |
 | Oils and sugar       |  0.0 |    0 |     0 |
-| nuts                 |  0.0 |    0 |     0 |
+| Nuts                 |  0.0 |    0 |     0 |
 | Mutton               |  0.0 |    0 |     0 |
 | Turkey               |  0.0 |    0 |     0 |
 | Ducks                |  0.0 |    0 |     0 |
@@ -505,15 +532,15 @@ kable(TotalWPRO_out[rev(order(TotalWPRO_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Vegetables and fruit |  4.7 |    4 |     5 |
+| Vegetables and fruit |  4.8 |    4 |     5 |
 | Dairy                |  3.0 |    3 |     3 |
 | Game                 |  1.0 |    1 |     1 |
 | Beef                 |  0.9 |    0 |     1 |
 | Meat                 |  0.6 |    0 |     2 |
-| Pork                 |  0.5 |    0 |     2 |
+| Pork                 |  0.6 |    0 |     2 |
 | Grains and beans     |  0.2 |    0 |     1 |
 | Oils and sugar       |  0.0 |    0 |     0 |
-| nuts                 |  0.0 |    0 |     0 |
+| Nuts                 |  0.0 |    0 |     0 |
 | Seafood              |  0.0 |    0 |     0 |
 | Mutton               |  0.0 |    0 |     0 |
 | Lamb                 |  0.0 |    0 |     0 |
@@ -547,22 +574,22 @@ kable(AttribAMRO_unk_out[rev(order(AttribAMRO_unk_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Unknown              | 54.6 | 54.6 |  54.6 |
-| Beef                 | 18.2 | 17.8 |  18.5 |
-| Vegetables and fruit | 16.0 | 15.5 |  16.5 |
-| Dairy                |  5.4 |  5.1 |   5.8 |
+| Unknown              | 54.4 | 54.4 |  54.4 |
+| Beef                 | 18.3 | 17.8 |  18.6 |
+| Vegetables and fruit | 16.1 | 15.5 |  16.5 |
+| Dairy                |  5.5 |  5.2 |   5.9 |
 | Grains and beans     |  1.4 |  1.1 |   1.7 |
 | Pork                 |  1.2 |  1.1 |   1.5 |
 | Meat                 |  1.1 |  1.1 |   1.3 |
 | Game                 |  0.5 |  0.5 |   0.7 |
-| Lamb                 |  0.5 |  0.4 |   0.5 |
-| nuts                 |  0.4 |  0.4 |   0.4 |
+| Lamb                 |  0.4 |  0.4 |   0.5 |
+| Nuts                 |  0.4 |  0.4 |   0.4 |
 | Seafood              |  0.4 |  0.4 |   0.4 |
-| Chicken              |  0.3 |  0.3 |   0.4 |
+| Chicken              |  0.1 |  0.1 |   0.3 |
 | Eggs                 |  0.0 |  0.0 |   0.1 |
-| Oils and sugar       |  0.0 |  0.0 |   0.1 |
-| Turkey               |  0.0 |  0.0 |   0.0 |
+| Oils and sugar       |  0.0 |  0.0 |   0.0 |
 | Mutton               |  0.0 |  0.0 |   0.0 |
+| Turkey               |  0.0 |  0.0 |   0.0 |
 | Ducks                |  0.0 |  0.0 |   0.0 |
 | Poultry              |  0.0 |  0.0 |   0.0 |
 
@@ -572,20 +599,20 @@ kable(AttribEURO_unk_out[rev(order(AttribEURO_unk_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Unknown              | 61.4 | 61.4 |  61.4 |
+| Unknown              | 61.9 | 61.9 |  61.9 |
 | Beef                 | 11.8 | 10.8 |  13.1 |
-| Vegetables and fruit | 10.8 |  9.7 |  11.9 |
+| Vegetables and fruit | 11.4 | 10.2 |  12.5 |
 | Dairy                |  6.2 |  6.2 |   6.2 |
-| Meat                 |  2.9 |  2.8 |   3.4 |
+| Meat                 |  2.3 |  1.7 |   2.8 |
 | Seafood              |  1.7 |  1.7 |   1.7 |
 | Pork                 |  1.7 |  1.7 |   1.7 |
 | Grains and beans     |  1.2 |  1.1 |   1.7 |
 | Lamb                 |  0.6 |  0.6 |   1.1 |
-| Chicken              |  0.6 |  0.6 |   0.6 |
 | Game                 |  0.6 |  0.6 |   0.6 |
 | Eggs                 |  0.6 |  0.6 |   0.6 |
+| Chicken              |  0.0 |  0.0 |   0.6 |
 | Oils and sugar       |  0.0 |  0.0 |   0.0 |
-| nuts                 |  0.0 |  0.0 |   0.0 |
+| Nuts                 |  0.0 |  0.0 |   0.0 |
 | Mutton               |  0.0 |  0.0 |   0.0 |
 | Turkey               |  0.0 |  0.0 |   0.0 |
 | Ducks                |  0.0 |  0.0 |   0.0 |
@@ -598,15 +625,15 @@ kable(AttribWPRO_unk_out[rev(order(AttribWPRO_unk_out[, 1])), ], digits = 1)
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
 | Unknown              | 68.6 | 68.6 |  68.6 |
-| Vegetables and fruit | 13.5 | 11.4 |  14.3 |
+| Vegetables and fruit | 13.6 | 11.4 |  14.3 |
 | Dairy                |  8.6 |  8.6 |   8.6 |
 | Game                 |  2.9 |  2.9 |   2.9 |
-| Beef                 |  2.6 |  0.0 |   2.9 |
-| Meat                 |  1.8 |  0.0 |   5.7 |
-| Pork                 |  1.5 |  0.0 |   5.7 |
-| Grains and beans     |  0.5 |  0.0 |   2.9 |
+| Beef                 |  2.7 |  0.0 |   2.9 |
+| Meat                 |  1.7 |  0.0 |   5.7 |
+| Pork                 |  1.6 |  0.0 |   5.7 |
+| Grains and beans     |  0.4 |  0.0 |   2.9 |
 | Oils and sugar       |  0.0 |  0.0 |   0.0 |
-| nuts                 |  0.0 |  0.0 |   0.0 |
+| Nuts                 |  0.0 |  0.0 |   0.0 |
 | Seafood              |  0.0 |  0.0 |   0.0 |
 | Mutton               |  0.0 |  0.0 |   0.0 |
 | Lamb                 |  0.0 |  0.0 |   0.0 |
@@ -631,21 +658,21 @@ kable(AttribAMRO_norm_out[rev(order(AttribAMRO_norm_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Beef                 | 40.0 | 39.2 |  40.7 |
-| Vegetables and fruit | 35.2 | 34.2 |  36.3 |
-| Dairy                | 12.0 | 11.2 |  12.7 |
-| Grains and beans     |  3.0 |  2.4 |   3.8 |
+| Beef                 | 40.1 | 39.1 |  40.9 |
+| Vegetables and fruit | 35.3 | 34.1 |  36.2 |
+| Dairy                | 12.1 | 11.5 |  12.9 |
+| Grains and beans     |  3.1 |  2.4 |   3.8 |
 | Pork                 |  2.7 |  2.4 |   3.2 |
-| Meat                 |  2.5 |  2.4 |   2.9 |
+| Meat                 |  2.4 |  2.4 |   2.9 |
 | Game                 |  1.2 |  1.2 |   1.5 |
 | Lamb                 |  1.0 |  0.9 |   1.2 |
-| nuts                 |  0.9 |  0.9 |   0.9 |
+| Nuts                 |  0.9 |  0.9 |   0.9 |
 | Seafood              |  0.9 |  0.9 |   0.9 |
-| Chicken              |  0.6 |  0.6 |   0.9 |
-| Eggs                 |  0.1 |  0.0 |   0.3 |
-| Oils and sugar       |  0.0 |  0.0 |   0.3 |
-| Turkey               |  0.0 |  0.0 |   0.0 |
+| Chicken              |  0.3 |  0.3 |   0.6 |
+| Eggs                 |  0.0 |  0.0 |   0.3 |
+| Oils and sugar       |  0.0 |  0.0 |   0.0 |
 | Mutton               |  0.0 |  0.0 |   0.0 |
+| Turkey               |  0.0 |  0.0 |   0.0 |
 | Ducks                |  0.0 |  0.0 |   0.0 |
 | Poultry              |  0.0 |  0.0 |   0.0 |
 
@@ -655,19 +682,19 @@ kable(AttribEURO_norm_out[rev(order(AttribEURO_norm_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Beef                 | 30.6 | 27.9 |  33.8 |
-| Vegetables and fruit | 27.9 | 25.0 |  30.9 |
-| Dairy                | 16.2 | 16.2 |  16.2 |
-| Meat                 |  7.5 |  7.4 |   8.8 |
-| Seafood              |  4.4 |  4.4 |   4.4 |
-| Pork                 |  4.4 |  4.4 |   4.4 |
-| Grains and beans     |  3.0 |  2.9 |   4.4 |
-| Lamb                 |  1.5 |  1.5 |   2.9 |
-| Chicken              |  1.5 |  1.5 |   1.5 |
+| Beef                 | 31.0 | 28.4 |  34.3 |
+| Vegetables and fruit | 30.0 | 26.9 |  32.8 |
+| Dairy                | 16.4 | 16.4 |  16.4 |
+| Meat                 |  6.0 |  4.5 |   7.5 |
+| Seafood              |  4.5 |  4.5 |   4.5 |
+| Pork                 |  4.5 |  4.5 |   4.5 |
+| Grains and beans     |  3.0 |  3.0 |   4.5 |
+| Lamb                 |  1.5 |  1.5 |   3.0 |
 | Game                 |  1.5 |  1.5 |   1.5 |
 | Eggs                 |  1.5 |  1.5 |   1.5 |
+| Chicken              |  0.1 |  0.0 |   1.5 |
 | Oils and sugar       |  0.0 |  0.0 |   0.0 |
-| nuts                 |  0.0 |  0.0 |   0.0 |
+| Nuts                 |  0.0 |  0.0 |   0.0 |
 | Mutton               |  0.0 |  0.0 |   0.0 |
 | Turkey               |  0.0 |  0.0 |   0.0 |
 | Ducks                |  0.0 |  0.0 |   0.0 |
@@ -679,15 +706,15 @@ kable(AttribWPRO_norm_out[rev(order(AttribWPRO_norm_out[, 1])), ], digits = 1)
 
 |                      | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: |
-| Vegetables and fruit | 43.0 | 36.4 |  45.5 |
+| Vegetables and fruit | 43.3 | 36.4 |  45.5 |
 | Dairy                | 27.3 | 27.3 |  27.3 |
 | Game                 |  9.1 |  9.1 |   9.1 |
 | Beef                 |  8.4 |  0.0 |   9.1 |
-| Meat                 |  5.9 |  0.0 |  18.2 |
-| Pork                 |  4.9 |  0.0 |  18.2 |
-| Grains and beans     |  1.5 |  0.0 |   9.1 |
+| Meat                 |  5.3 |  0.0 |  18.2 |
+| Pork                 |  5.2 |  0.0 |  18.2 |
+| Grains and beans     |  1.4 |  0.0 |   9.1 |
 | Oils and sugar       |  0.0 |  0.0 |   0.0 |
-| nuts                 |  0.0 |  0.0 |   0.0 |
+| Nuts                 |  0.0 |  0.0 |   0.0 |
 | Seafood              |  0.0 |  0.0 |   0.0 |
 | Mutton               |  0.0 |  0.0 |   0.0 |
 | Lamb                 |  0.0 |  0.0 |   0.0 |
@@ -727,7 +754,7 @@ ggplot(df, aes(x = Food, y = mean)) +
   scale_x_discrete(NULL)
 ```
 
-![](stec-outbreaks-multinom2_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](stec-outbreaks-multinom3_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 ## plot all results / normalized
@@ -759,7 +786,7 @@ ggplot(df2, aes(x = Food, y = mean)) +
   scale_x_discrete(NULL)
 ```
 
-![](stec-outbreaks-multinom2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](stec-outbreaks-multinom3_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 ## summary table
@@ -771,23 +798,23 @@ kable(
 |                      | mean | 2.5% | 97.5% | mean | 2.5% | 97.5% | mean | 2.5% | 97.5% |
 | -------------------- | ---: | ---: | ----: | ---: | ---: | ----: | ---: | ---: | ----: |
 | Eggs                 |  0.0 |  0.0 |   0.1 |  0.6 |  0.6 |   0.6 |  0.0 |  0.0 |   0.0 |
-| Dairy                |  5.4 |  5.1 |   5.8 |  6.2 |  6.2 |   6.2 |  8.6 |  8.6 |   8.6 |
-| Meat                 |  1.1 |  1.1 |   1.3 |  2.9 |  2.8 |   3.4 |  1.8 |  0.0 |   5.7 |
+| Dairy                |  5.5 |  5.2 |   5.9 |  6.2 |  6.2 |   6.2 |  8.6 |  8.6 |   8.6 |
+| Meat                 |  1.1 |  1.1 |   1.3 |  2.3 |  1.7 |   2.8 |  1.7 |  0.0 |   5.7 |
 | Poultry              |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
-| Chicken              |  0.3 |  0.3 |   0.4 |  0.6 |  0.6 |   0.6 |  0.0 |  0.0 |   0.0 |
+| Chicken              |  0.1 |  0.1 |   0.3 |  0.0 |  0.0 |   0.6 |  0.0 |  0.0 |   0.0 |
 | Ducks                |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
 | Turkey               |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
-| Beef                 | 18.2 | 17.8 |  18.5 | 11.8 | 10.8 |  13.1 |  2.6 |  0.0 |   2.9 |
-| Pork                 |  1.2 |  1.1 |   1.5 |  1.7 |  1.7 |   1.7 |  1.5 |  0.0 |   5.7 |
-| Lamb                 |  0.5 |  0.4 |   0.5 |  0.6 |  0.6 |   1.1 |  0.0 |  0.0 |   0.0 |
+| Beef                 | 18.3 | 17.8 |  18.6 | 11.8 | 10.8 |  13.1 |  2.7 |  0.0 |   2.9 |
+| Pork                 |  1.2 |  1.1 |   1.5 |  1.7 |  1.7 |   1.7 |  1.6 |  0.0 |   5.7 |
+| Lamb                 |  0.4 |  0.4 |   0.5 |  0.6 |  0.6 |   1.1 |  0.0 |  0.0 |   0.0 |
 | Mutton               |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
 | Game                 |  0.5 |  0.5 |   0.7 |  0.6 |  0.6 |   0.6 |  2.9 |  2.9 |   2.9 |
-| Vegetables and fruit | 16.0 | 15.5 |  16.5 | 10.8 |  9.7 |  11.9 | 13.5 | 11.4 |  14.3 |
-| Grains and beans     |  1.4 |  1.1 |   1.7 |  1.2 |  1.1 |   1.7 |  0.5 |  0.0 |   2.9 |
+| Vegetables and fruit | 16.1 | 15.5 |  16.5 | 11.4 | 10.2 |  12.5 | 13.6 | 11.4 |  14.3 |
+| Grains and beans     |  1.4 |  1.1 |   1.7 |  1.2 |  1.1 |   1.7 |  0.4 |  0.0 |   2.9 |
 | Seafood              |  0.4 |  0.4 |   0.4 |  1.7 |  1.7 |   1.7 |  0.0 |  0.0 |   0.0 |
-| nuts                 |  0.4 |  0.4 |   0.4 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
-| Oils and sugar       |  0.0 |  0.0 |   0.1 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
-| Unknown              | 54.6 | 54.6 |  54.6 | 61.4 | 61.4 |  61.4 | 68.6 | 68.6 |  68.6 |
+| Nuts                 |  0.4 |  0.4 |   0.4 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
+| Oils and sugar       |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |  0.0 |  0.0 |   0.0 |
+| Unknown              | 54.4 | 54.4 |  54.4 | 61.9 | 61.9 |  61.9 | 68.6 | 68.6 |  68.6 |
 
 # R session info
 
@@ -813,17 +840,18 @@ sessionInfo()
     ## [1] knitr_1.20    ggplot2_3.0.0 bd_0.0.12    
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_0.12.18     cellranger_1.1.0 compiler_3.5.1   pillar_1.3.0    
-    ##  [5] plyr_1.8.4       highr_0.7        bindr_0.1.1      tools_3.5.1     
-    ##  [9] digest_0.6.15    evaluate_0.11    tibble_1.4.2     gtable_0.2.0    
-    ## [13] pkgconfig_2.0.1  rlang_0.2.1      yaml_2.2.0       bindrcpp_0.2.2  
-    ## [17] withr_2.1.2      stringr_1.3.1    dplyr_0.7.6      rprojroot_1.3-2 
-    ## [21] grid_3.5.1       tidyselect_0.2.4 glue_1.3.0       R6_2.2.2        
-    ## [25] readxl_1.1.0     foreign_0.8-70   rmarkdown_1.10   reshape2_1.4.3  
-    ## [29] purrr_0.2.5      magrittr_1.5     backports_1.1.2  scales_1.0.0    
-    ## [33] htmltools_0.3.6  assertthat_0.2.0 colorspace_1.3-2 labeling_0.3    
-    ## [37] stringi_1.1.7    lazyeval_0.2.1   munsell_0.5.0    crayon_1.3.4
+    ##  [1] Rcpp_0.12.18     highr_0.7        cellranger_1.1.0 compiler_3.5.1  
+    ##  [5] pillar_1.3.0     plyr_1.8.4       bindr_0.1.1      tools_3.5.1     
+    ##  [9] mc2d_0.1-18      digest_0.6.15    evaluate_0.11    tibble_1.4.2    
+    ## [13] gtable_0.2.0     pkgconfig_2.0.1  rlang_0.2.1      yaml_2.2.0      
+    ## [17] mvtnorm_1.0-8    bindrcpp_0.2.2   withr_2.1.2      stringr_1.3.1   
+    ## [21] dplyr_0.7.6      rprojroot_1.3-2  grid_3.5.1       tidyselect_0.2.4
+    ## [25] glue_1.3.0       R6_2.2.2         readxl_1.1.0     foreign_0.8-70  
+    ## [29] rmarkdown_1.10   reshape2_1.4.3   purrr_0.2.5      magrittr_1.5    
+    ## [33] backports_1.1.2  scales_1.0.0     htmltools_0.3.6  assertthat_0.2.0
+    ## [37] colorspace_1.3-2 labeling_0.3     stringi_1.1.7    lazyeval_0.2.1  
+    ## [41] munsell_0.5.0    crayon_1.3.4
 
 ``` r
-#rmarkdown::render("stec-outbreaks-multinom2.R")
+#rmarkdown::render("stec-outbreaks-multinom3.R")
 ```
